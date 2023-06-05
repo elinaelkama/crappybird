@@ -21,6 +21,8 @@ public class Obstacle extends JPanel {
         upper = new JLabel();
         lower = new JLabel();
 
+        this.setBackground(new Color(173, 216, 230));
+
         int gapStart = Math.round((height - gapSize) * gapPosition);
 
         upper.setBounds(0, 0, width, gapStart);

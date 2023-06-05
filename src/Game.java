@@ -27,15 +27,17 @@ public class Game extends JFrame implements KeyListener {
     public Game(int windowWidth, int windowHeight){
 
         this.setTitle("CrappyBird");
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // Exit the program when the window is closed
-        this.setResizable(false); // Prevent the window from being resized
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setResizable(false);
         this.setSize(windowWidth, windowHeight);
 
-        this.setLocationRelativeTo(null); // Center the window on the screen
+        this.setLocationRelativeTo(null);
         this.setLayout(null);
-        this.setVisible(true); // Make the window visible
+
+        this.setVisible(true);
+
         this.addKeyListener(this);
-        this.setBackground(new Color(173, 216, 230));
+        this.getContentPane().setBackground(new Color(173, 216, 230));
 
         this.obstacleRemoveList = new ArrayList<>();
         obstacles = new ArrayList<>();
@@ -92,12 +94,13 @@ public class Game extends JFrame implements KeyListener {
                 this.remove(obstacles.get(i));
             }
         }
-
+        bird.iconUp();
         bird.applyMomentum();
         bird.applyGravity(0.25f);
 
         if (isKeyDown){
             bird.flap(1.5f);
+            bird.iconDown();
         }
 
         if(obstacleRemoveList.size() > 0){

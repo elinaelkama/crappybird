@@ -10,9 +10,17 @@ public class Bird extends JLabel {
     private int lowerBoundary;
 
     public Bird(int initialX, int initialY, int width, int height, int lowerBoundary) {
-        this.setBounds(initialX, initialY, width, height);
-        this.setBackground(Color.red);
-        this.setOpaque(true);
+        ImageIcon birdUp = new ImageIcon(getClass().getResource("./up.png"));
+        ImageIcon birdDown = new ImageIcon(getClass().getResource("down.png"));
+
+        birdUp = new ImageIcon(birdUp.getImage().getScaledInstance(width, height, java.awt.Image.SCALE_SMOOTH));
+        birdDown = new ImageIcon(birdDown.getImage().getScaledInstance(width, height, java.awt.Image.SCALE_SMOOTH));
+
+        //-10 to compensate png not being as big as bounds
+        this.setBounds(initialX, initialY, width - 10, height -10);
+        //this.setBackground(Color.red);
+        this.setIcon(birdUp);
+        //this.setOpaque(true);
 
         this.lowerBoundary = lowerBoundary - height;
     }
@@ -41,6 +49,18 @@ public class Bird extends JLabel {
             }
             momentumY -= flapStrength;
         }
+    }
+
+    public void iconUp(){
+        ImageIcon birdUp = new ImageIcon(getClass().getResource("./up.png"));
+        birdUp = new ImageIcon(birdUp.getImage().getScaledInstance(getWidth(), getHeight(), java.awt.Image.SCALE_SMOOTH));
+        setIcon(birdUp);
+    }
+
+    public void iconDown(){
+        ImageIcon birdDown = new ImageIcon(getClass().getResource("down.png"));
+        birdDown = new ImageIcon(birdDown.getImage().getScaledInstance(getWidth(), getHeight(), java.awt.Image.SCALE_SMOOTH));
+        setIcon(birdDown);
     }
 
     private float calculatePower(float value) {
