@@ -2,7 +2,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
-import java.util.List;
 
 public class Obstacle extends JPanel {
     private int gapSize;
@@ -12,6 +11,8 @@ public class Obstacle extends JPanel {
 
     private JLabel lower;
 
+    private boolean passed = false;
+
     private static final int DRAW_THRESHOLD = 10;
 
     public Obstacle(int initialX, int initialY, int width, int height, int gapSize, float gapPosition) {
@@ -19,6 +20,7 @@ public class Obstacle extends JPanel {
         this.gapPosition = gapPosition;
 
         this.setBounds(initialX, initialY, width, height);
+        this.setLayout(null);
         setVisible(true);
 
         upper = new JLabel();
@@ -70,17 +72,29 @@ public class Obstacle extends JPanel {
         this.setOpaque(true);
     }
 
-
-    public List<Rectangle> getRectangles(){
-        List<Rectangle> rectangles = new ArrayList<>();
+    public ArrayList<Rectangle> getCollisionBoxes(){
+        ArrayList<Rectangle> rectangles = new ArrayList<>();
         if (upper.getHeight() > DRAW_THRESHOLD) {
-            rectangles.add(new Rectangle(this.getX(), 0, upper.getWidth() - 10, upper.getHeight() - 10));
+            rectangles.add(new Rectangle(this.getX() + 10, 0, upper.getWidth() - 20, upper.getHeight() - 20));
         }
 
         if (lower.getHeight() > DRAW_THRESHOLD) {
-            rectangles.add(new Rectangle(this.getX(), lower.getY(), lower.getWidth() - 10, lower.getHeight() - 10));
+            rectangles.add(new Rectangle(this.getX() + 20, lower.getY(), lower.getWidth() - 40, lower.getHeight()));
         }
         return rectangles;
     }
 
+    public ArrayList<Rectangle> getScoreBoxes(){
+        ArrayList<Rectangle> boxes = new ArrayList<>();
+        boxes.add(new Rectangle(this.getX(), lower.getY() - gapSize, this.getWidth(), gapSize));
+        return boxes;
+    }
+
+    public void setPassed(){
+        passed = true;
+    }
+
+    public boolean getPassed(){
+        return passed;
+    }
 }

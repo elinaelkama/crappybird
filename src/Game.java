@@ -16,6 +16,7 @@ public class Game extends JPanel implements KeyListener {
     private List<Integer> obstacleRemoveList;
     private Timer timer;
 
+    private ScoreLabel scoreLabel;
     private boolean isKeyDown = false;
     private boolean gameOver = false;
 
@@ -23,8 +24,10 @@ public class Game extends JPanel implements KeyListener {
 
     private LocalTime obstaclesDisabledUntil;
 
+    private StartScreen startScreen;
+    private GameOverScreen gameOverScreen;
 
-    private JLabel gameOverText;
+    private boolean gameStarted = false;
 
     private int windowWidth;
     private int windowHeight;
@@ -39,18 +42,20 @@ public class Game extends JPanel implements KeyListener {
         this.setBackground(new Color(173, 216, 230));
         this.setLayout(null);
 
-
-
-
         bird = new Bird(100, windowHeight/2, 80, 80, windowHeight);
         this.add(bird.getLabel());
 
+        startScreen = new StartScreen(0, 0, windowWidth, windowHeight);
+        this.add(startScreen);
+
+        scoreLabel = new ScoreLabel(windowWidth - 5 - 50, 5, 50, 50);
+        this.add(scoreLabel);
+
         setVisible(true);
 
-
-        gameOverText = new GameOverScreen((windowWidth - 400) / 2, (windowHeight - 200) / 2, 400, 200, "Game Over");
-        this.add(gameOverText);
-        setComponentZOrder(gameOverText, 0);
+        gameOverScreen = new GameOverScreen((windowWidth - 400) / 2, (windowHeight - 200) / 2, 400, 200, "Game Over");
+        this.add(gameOverScreen);
+        setComponentZOrder(gameOverScreen, 0);
 
         this.obstacleRemoveList = new ArrayList<>();
         obstacles = new ArrayList<>();
@@ -101,11 +106,17 @@ public class Game extends JPanel implements KeyListener {
 
     private boolean checkCollision() {
         for (Obstacle o : obstacles){
-            if (bird.collidesWith(o)){
+            if (bird.collidesWith(o.getCollisionBoxes())){
                 gameOver = true;
-                gameOverText.show();
+                gameOverScreen.show(scoreLabel.getScore());
+            }
+
+            if(!o.getPassed() && bird.collidesWith(o.getScoreBoxes())){
+                o.setPassed();
+                scoreLabel.incrementScore();
             }
         }
+
         if(gameOver){
             for(Obstacle o : obstacles){
                 this.remove(o);
@@ -118,6 +129,16 @@ public class Game extends JPanel implements KeyListener {
     }
 
     public void update(){
+        if(!gameStarted) {
+            startScreen.show();
+            if(isKeyDown) {
+                gameStarted = true;
+                startScreen.hide();
+                obstaclesDisabledUntil = LocalTime.now().plusSeconds(1);
+            }
+            return;
+        }
+
         if (gameOver) {
             if(isKeyDown && isKeysEnabled()){
                 restart();
@@ -160,13 +181,13 @@ public class Game extends JPanel implements KeyListener {
     }
 
     public void restart(){
-        gameOverText.hide();
+        gameOverScreen.hide();
         gameOver = false;
+        scoreLabel.reset();
         initStage();
     }
 
     public void run() {
-        obstaclesDisabledUntil = LocalTime.now().plusSeconds(1);
         timer.start();
     }
 

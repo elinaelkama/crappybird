@@ -5,25 +5,23 @@ public class GameOverScreen extends JLabel {
 
     private String gameOverText;
 
-    private Rectangle initBounds;
-
-    public GameOverScreen(int initialX, int initialY, int width, int height,String text){
-        super(text);
+    public GameOverScreen(int initialX, int initialY, int width, int height, String text){
         setFont(new Font("Serif", Font.BOLD, 40));
         setBackground(Color.BLACK);
         setForeground(Color.WHITE);
-        setBounds(initialX,initialY,width,height);
+        setBounds(initialX, initialY, width, height);
         setText(" ");
-        gameOverText = "<html> <div style=\"text-align: center;\">"+ text + "<br>Press any key to restart</dív> </html>";
-        setHorizontalTextPosition(JLabel.CENTER);
-        setVerticalTextPosition(JLabel.BOTTOM);
+        gameOverText = text + "<br>Press any key<br>";
         setOpaque(false);
-        setVerticalAlignment(SwingConstants.CENTER);
         setHorizontalAlignment(SwingConstants.CENTER);
+        setVerticalAlignment(SwingConstants.CENTER);
     }
 
-    public void show(){
-        setText(gameOverText);
+    public void setText(String text){
+        super.setText("<html><center>" + text + "</center></html>");
+    }
+    public void show(int score){
+        setText(gameOverText + "Score: " + Integer.toString(score));
         setOpaque(true);
     }
 

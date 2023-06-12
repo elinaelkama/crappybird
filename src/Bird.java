@@ -1,5 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
 
 public class Bird {
 
@@ -76,8 +77,8 @@ public class Bird {
         return (float) Math.pow(powerBase, Math.abs(value));
     }
 
-    public boolean collidesWith(Obstacle obstacle){
-        for (Rectangle rect : obstacle.getRectangles()) {
+    public boolean collidesWith(ArrayList<Rectangle> rectangles){
+        for (Rectangle rect : rectangles) {
             if(label.getBounds().intersects(rect)){
                 return true;
             }
