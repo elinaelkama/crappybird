@@ -29,6 +29,19 @@ public class Game extends JPanel implements KeyListener {
 
     private boolean gameStarted = false;
 
+    private Random obstacleRandomizer;
+
+    private int scoreRequiredForLevelComplete;
+    private int levelsToBeatTheGame;
+
+    private long[] levelSeeds = {13, 8, 33, 21, 14};
+    private int currentLevel = 0;
+
+    private LevelCompleteScreen levelCompleteScreen;
+    private GameCompleteScreen gameCompleteScreen;
+    private boolean levelComplete = false;
+    private boolean gameWon = false;
+
     private int windowWidth;
     private int windowHeight;
 
@@ -51,6 +64,12 @@ public class Game extends JPanel implements KeyListener {
         scoreLabel = new ScoreLabel(windowWidth - 5 - 50, 5, 50, 50);
         this.add(scoreLabel);
 
+        levelCompleteScreen = new LevelCompleteScreen((windowWidth - 400) / 2, (windowHeight - 200) / 2, 400, 200);
+        this.add(levelCompleteScreen);
+
+        gameCompleteScreen = new GameCompleteScreen(0, 0, windowWidth, windowHeight);
+        this.add(gameCompleteScreen);
+
         setVisible(true);
 
         gameOverScreen = new GameOverScreen((windowWidth - 400) / 2, (windowHeight - 200) / 2, 400, 200, "Game Over");
@@ -60,7 +79,9 @@ public class Game extends JPanel implements KeyListener {
         this.obstacleRemoveList = new ArrayList<>();
         obstacles = new ArrayList<>();
 
-        initStage();
+        this.scoreRequiredForLevelComplete = 15;
+        this.levelsToBeatTheGame = 5;
+        initStage(0);
 
         timer = new Timer(DELAY, new ActionListener() {
             @Override
@@ -70,10 +91,14 @@ public class Game extends JPanel implements KeyListener {
         });
     }
 
-    private void initStage() {
+    private void initStage(int levelNumber) {
+
+        levelCompleteScreen.hide();
+        long seed = levelSeeds[levelNumber];
+
+        obstacleRandomizer = new Random(seed);
         bird.resetPosition();
         bird.resetMomentum();
-
     }
 
     private boolean isObstaclesEnabled(){
@@ -93,9 +118,7 @@ public class Game extends JPanel implements KeyListener {
     private void createNewObstacle() {
         int gapSize = 250;
 
-        Random random = new Random();
-
-        float newPos = (random.nextFloat());
+        float newPos = obstacleRandomizer.nextFloat();
         float gapPos = newPos;
 
         // Create a new obstacle and add it to the list
@@ -116,15 +139,6 @@ public class Game extends JPanel implements KeyListener {
                 scoreLabel.incrementScore();
             }
         }
-
-        if(gameOver){
-            for(Obstacle o : obstacles){
-                this.remove(o);
-            }
-            obstacles.clear();
-            obstacleRemoveList.clear();
-            keysDisabledUntil = LocalTime.now().plusSeconds(1);
-        }
         return gameOver;
     }
 
@@ -139,8 +153,22 @@ public class Game extends JPanel implements KeyListener {
             return;
         }
 
-        if (gameOver) {
+        if (gameOver || levelComplete) {
             if(isKeyDown && isKeysEnabled()){
+                restart();
+            }
+            return;
+        }
+
+        if(scoreLabel.getScore() == scoreRequiredForLevelComplete){
+            levelComplete = true;
+            currentLevel++;
+            scoreRequiredForLevelComplete += 5;
+            levelCompleteScreen.show(this.currentLevel, scoreLabel.getScore());
+
+
+            if(isKeyDown && isKeysEnabled()){
+
                 restart();
             }
             return;
@@ -181,10 +209,33 @@ public class Game extends JPanel implements KeyListener {
     }
 
     public void restart(){
-        gameOverScreen.hide();
+        for(Obstacle o : obstacles){
+            this.remove(o);
+        }
+        obstacles.clear();
+        obstacleRemoveList.clear();
+        keysDisabledUntil = LocalTime.now().plusSeconds(1);
+
+        if(levelComplete){
+            levelCompleteScreen.hide();
+        }
+
+        if(gameOver){
+            gameOverScreen.hide();
+        }
+
+        if(currentLevel == levelsToBeatTheGame){
+            gameWon = true;
+            gameCompleteScreen.show();
+            timer.stop();
+            return;
+        }
+        levelComplete = false;
         gameOver = false;
         scoreLabel.reset();
-        initStage();
+        if(currentLevel != levelsToBeatTheGame){
+            initStage(currentLevel);
+        }
     }
 
     public void run() {
