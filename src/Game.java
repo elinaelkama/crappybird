@@ -80,7 +80,7 @@ public class Game extends JPanel implements KeyListener {
         obstacles = new ArrayList<>();
 
         this.scoreRequiredForLevelComplete = 15;
-        this.levelsToBeatTheGame = 5;
+        this.levelsToBeatTheGame = levelSeeds.length;
         initStage(0);
 
         timer = new Timer(DELAY, new ActionListener() {
@@ -92,7 +92,6 @@ public class Game extends JPanel implements KeyListener {
     }
 
     private void initStage(int levelNumber) {
-
         levelCompleteScreen.hide();
         long seed = levelSeeds[levelNumber];
 
