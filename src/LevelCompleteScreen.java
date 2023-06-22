@@ -21,7 +21,7 @@ public class LevelCompleteScreen extends JLabel {
         super.setText("<html><center>" + text + "</center></html>");
     }
     public void show(int level, int score){
-        setText(text + level + "<br>Score: " + Integer.toString(score) + "<br>Press any key");
+        setText(text + level + " Complete<br>Score: " + Integer.toString(score) + "<br>Press any key");
         setOpaque(true);
     }
 
