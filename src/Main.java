@@ -6,12 +6,14 @@ import java.awt.*;
 public class Main {
     public static void main(String[] args) {
 
+        GameConfig config = new GameConfig();
+
         JFrame frame = new JFrame();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setTitle("CrappyBird");
         frame.setResizable(false);
 
-        Game game = new Game(800, 600);
+        Game game = new Game(config.getWindowWidth(), config.getWindowHeight(), config);
         frame.addKeyListener(game);
 
         frame.add(game);

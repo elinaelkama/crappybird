@@ -33,9 +33,12 @@ public class Game extends JPanel implements KeyListener {
 
     private int scoreRequiredForLevelComplete;
     private int levelsToBeatTheGame;
+    private int scoreRequirementIncrease;
 
-    private long[] levelSeeds = {13, 8, 33, 21, 14};
-    private int currentLevel = 0;
+    private GameConfig config;
+
+    private long[] levelSeeds;
+    private int currentLevel;
 
     private LevelCompleteScreen levelCompleteScreen;
     private GameCompleteScreen gameCompleteScreen;
@@ -48,7 +51,7 @@ public class Game extends JPanel implements KeyListener {
     private final int FRAME_RATE = 120;  // Desired frames per second
     private final int DELAY = 1000 / FRAME_RATE;  // Delay between frames in milliseconds
 
-    public Game(int windowWidth, int windowHeight){
+    public Game(int windowWidth, int windowHeight, GameConfig config){
         this.windowWidth = windowWidth;
         this.windowHeight = windowHeight;
         this.setPreferredSize(new Dimension(windowWidth, windowHeight));
@@ -79,8 +82,15 @@ public class Game extends JPanel implements KeyListener {
         this.obstacleRemoveList = new ArrayList<>();
         obstacles = new ArrayList<>();
 
-        this.scoreRequiredForLevelComplete = 15;
-        this.levelsToBeatTheGame = 5;
+        this.config = config;
+
+        this.scoreRequiredForLevelComplete = config.getScoreRequiredForLevelComplete();
+        scoreRequirementIncrease = config.getScoreRequirementIncrease();
+        levelSeeds = config.getLevelSeeds();
+        this.levelsToBeatTheGame = levelSeeds.length;
+
+
+        currentLevel = 0;
         initStage(0);
 
         timer = new Timer(DELAY, new ActionListener() {
@@ -116,10 +126,13 @@ public class Game extends JPanel implements KeyListener {
     }
 
     private void createNewObstacle() {
-        int gapSize = 250;
+        int gapSize = config.getGapSize();
 
         float newPos = obstacleRandomizer.nextFloat();
-        float gapPos = newPos;
+        float gapPos= newPos;
+        if(obstacles.size() != 0 && Math.abs(newPos - obstacles.get(obstacles.size() -1).getGapPosition()) <= 0.1f){
+            gapPos = obstacleRandomizer.nextFloat();
+        }
 
         // Create a new obstacle and add it to the list
         Obstacle obstacle = new Obstacle(getWidth(),0, 100, getHeight(), gapSize, gapPos);
@@ -131,6 +144,7 @@ public class Game extends JPanel implements KeyListener {
         for (Obstacle o : obstacles){
             if (bird.collidesWith(o.getCollisionBoxes())){
                 gameOver = true;
+                keysDisabledUntil = LocalTime.now().plusSeconds(1);
                 gameOverScreen.show(scoreLabel.getScore());
             }
 
@@ -163,7 +177,7 @@ public class Game extends JPanel implements KeyListener {
         if(scoreLabel.getScore() == scoreRequiredForLevelComplete){
             levelComplete = true;
             currentLevel++;
-            scoreRequiredForLevelComplete += 5;
+            scoreRequiredForLevelComplete += scoreRequirementIncrease;
             levelCompleteScreen.show(this.currentLevel, scoreLabel.getScore());
 
 
@@ -191,10 +205,10 @@ public class Game extends JPanel implements KeyListener {
 
         bird.iconUp();
         bird.applyMomentum();
-        bird.applyGravity(0.25f);
+        bird.applyGravity(config.getGravity());
 
         if (isKeyDown){
-            bird.flap(1.5f);
+            bird.flap(config.getFlapStrength());
             bird.iconDown();
         }
 
@@ -214,7 +228,6 @@ public class Game extends JPanel implements KeyListener {
         }
         obstacles.clear();
         obstacleRemoveList.clear();
-        keysDisabledUntil = LocalTime.now().plusSeconds(1);
 
         if(levelComplete){
             levelCompleteScreen.hide();

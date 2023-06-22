@@ -72,6 +72,10 @@ public class Obstacle extends JPanel {
         this.setOpaque(true);
     }
 
+    public float getGapPosition() {
+        return gapPosition;
+    }
+
     public ArrayList<Rectangle> getCollisionBoxes(){
         ArrayList<Rectangle> rectangles = new ArrayList<>();
         if (upper.getHeight() > DRAW_THRESHOLD) {
